@@ -1,5 +1,5 @@
-import DotsVerticalRoundedIcon from "./icons/DotsVerticalRoundedIcon";
 import MessagePlusIcon from "./icons/MessagePlusIcon";
+import MenuDropdown from "./MenuDropdown";
 
 export default function Sidebar({ onSelectChat }: any) {
   return (
@@ -21,7 +21,7 @@ export default function Sidebar({ onSelectChat }: any) {
           </button>
 
           <button className="p-2 rounded-full transition text-gray-700 dark:text-gray-200    hover:bg-blue-50 dark:hover:bg-slate-700">
-            <DotsVerticalRoundedIcon />
+            <MenuDropdown />
           </button>
         </div>
       </header>

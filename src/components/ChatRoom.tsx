@@ -1,3 +1,5 @@
+import ArrowLeftStrokeIcon from "./icons/ArrowLeftStrokeIcon";
+
 export default function ChatRoom({ chat, onBack }: any) {
   if (!chat) {
     return (
@@ -14,8 +16,8 @@ export default function ChatRoom({ chat, onBack }: any) {
         {/* back button (mobile only) */}
         <button
           onClick={onBack}
-          className="mr-3 md:hidden p-2 hover:bg-blue-50 dark:hover:bg-slate-700 rounded-full">
-          ←
+          className="mr-3 md:hidden p-2 text-white hover:bg-blue-50 dark:hover:bg-slate-700 rounded-full">
+          <ArrowLeftStrokeIcon width={32} height={32} />
         </button>
 
         <h2 className="font-semibold text-lg text-gray-900 dark:text-white">
@@ -25,16 +27,17 @@ export default function ChatRoom({ chat, onBack }: any) {
 
       {/* MESSAGES */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-        {[1, 2, 3].map((msg, i) => (
+        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((msg, i) => (
           <div
             key={i}
-            className={`max-w-[70%] px-4 py-2 rounded-lg text-sm
+            className={`max-w-[40%] px-4 py-2 rounded-lg text-sm
             ${
               i % 2 === 0
                 ? "bg-blue-500 text-white ml-auto"
                 : "bg-gray-200 dark:bg-slate-700 dark:text-white"
             }`}>
-            Message {msg}
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua {msg}
           </div>
         ))}
       </div>
