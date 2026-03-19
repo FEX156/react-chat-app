@@ -31,7 +31,6 @@ axiosInstance.interceptors.request.use(
     if (config.url?.includes("/auth/session/refresh")) return config;
 
     const token = useAuthStore.getState().accessToken;
-    console.log(`aksestoken = ${token}`);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -48,7 +47,6 @@ axiosInstance.interceptors.response.use(
       _retry?: boolean;
     };
 
-    // ⛔ skip kalau request ke endpoint refresh
     if (originalRequest?.url?.includes("/auth/session/refresh")) {
       return Promise.reject(error);
     }
@@ -71,15 +69,11 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        console.log("MENGIRIM REQUEST ACCES BARU");
-
         const { data } = await axiosInstance.post(
           "/auth/session/refresh",
           {},
           { withCredentials: true },
         );
-
-        console.log(data);
 
         const newAccessToken = data.data.token;
 
@@ -94,8 +88,6 @@ axiosInstance.interceptors.response.use(
 
         return axiosInstance(originalRequest);
       } catch (error: any) {
-        console.log(error.code);
-
         processQueue(error, null);
 
         // ❌ clear auth kalau refresh gagal
