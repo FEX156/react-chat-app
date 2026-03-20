@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import ConfirmLogoutDialog from "./ConfirmLogoutDialog";
 import DotsVerticalRoundedIcon from "./icons/DotsVerticalRoundedIcon";
-import axiosInstance from "#/libs/axios";
+import { privateAxios } from "#/libs/axios";
 
 export default function MenuDropdown() {
   const [open, setOpen] = useState(false);
@@ -11,7 +11,7 @@ export default function MenuDropdown() {
   const handleSubmit = async () => {
     try {
       const endpoint = "/auth/session/logout";
-      await axiosInstance.post(endpoint);
+      await privateAxios.post(endpoint);
       window.location.reload();
     } catch (error) {
       console.error("Logout error:", error);

@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import axiosInstance from "#/libs/axios";
+import { publicAxios } from "#/libs/axios";
 
 export const Route = createFileRoute("/register")({
   component: RegisterForm,
@@ -17,7 +17,7 @@ function RegisterForm() {
 
     try {
       const endpoint = "/auth/register";
-      const response = await axiosInstance.post(endpoint, payload);
+      const response = await publicAxios.post(endpoint, payload);
       console.log(response);
       setMessage("Registration successful! Please login to continue.");
       navigate({ to: "/login" });

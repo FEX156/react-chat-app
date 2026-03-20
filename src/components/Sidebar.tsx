@@ -16,13 +16,13 @@ export default function Sidebar({ onSelectChat }: any) {
         </h2>
 
         <div className="flex items-center gap-3">
-          <button className="p-2 rounded-full transition text-gray-700 dark:text-gray-200    hover:bg-blue-50 dark:hover:bg-slate-700">
+          <span className="p-2 rounded-full transition text-gray-700 dark:text-gray-200    hover:bg-blue-50 dark:hover:bg-slate-700">
             <MessagePlusIcon />
-          </button>
+          </span>
 
-          <button className="p-2 rounded-full transition text-gray-700 dark:text-gray-200    hover:bg-blue-50 dark:hover:bg-slate-700">
+          <span className="p-2 rounded-full transition text-gray-700 dark:text-gray-200    hover:bg-blue-50 dark:hover:bg-slate-700">
             <MenuDropdown />
-          </button>
+          </span>
         </div>
       </header>
 

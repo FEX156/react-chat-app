@@ -1,4 +1,4 @@
-import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
+import axios, { type InternalAxiosRequestConfig } from "axios";
 import { useAuthStore } from "#/store/authStore";
 
 // flag untuk mencegah multiple refresh token request saat banyak request gagal barengan
@@ -16,7 +16,7 @@ const processQueue = (error: any, token: string | null = null) => {
   failedQueue = [];
 };
 
-const axiosInstance = axios.create({
+export const privateAxios = axios.create({
   baseURL: "http://localhost:5000/v1",
   timeout: 10000,
   withCredentials: true,
@@ -25,8 +25,16 @@ const axiosInstance = axios.create({
   },
 });
 
+export const publicAxios = axios.create({
+  baseURL: "http://localhost:5000/v1",
+  timeout: 10000,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 // Request Interceptor: Otomatis tempelkan token jika ada
-axiosInstance.interceptors.request.use(
+privateAxios.interceptors.request.use(
   (config) => {
     if (config.url?.includes("/auth/session/refresh")) return config;
 
@@ -40,9 +48,9 @@ axiosInstance.interceptors.request.use(
 );
 
 // --- RESPONSE INTERCEPTOR ---
-axiosInstance.interceptors.response.use(
+privateAxios.interceptors.response.use(
   (response) => response,
-  async (error: AxiosError) => {
+  async (error) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
     };
@@ -60,7 +68,7 @@ axiosInstance.interceptors.response.use(
             if (token) {
               originalRequest.headers.Authorization = `Bearer ${token}`;
             }
-            return axiosInstance(originalRequest);
+            return privateAxios(originalRequest);
           })
           .catch((err) => Promise.reject(err));
       }
@@ -69,7 +77,7 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const { data } = await axiosInstance.post(
+        const { data } = await privateAxios.post(
           "/auth/session/refresh",
           {},
           { withCredentials: true },
@@ -77,20 +85,16 @@ axiosInstance.interceptors.response.use(
 
         const newAccessToken = data.data.token;
 
-        // ✅ simpan ke store
         useAuthStore.getState().setAccessToken(newAccessToken);
 
-        // ✅ resolve semua queue
         processQueue(null, newAccessToken);
 
-        // ✅ pastikan header ke-overwrite
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
-        return axiosInstance(originalRequest);
+        return privateAxios(originalRequest);
       } catch (error: any) {
         processQueue(error, null);
 
-        // ❌ clear auth kalau refresh gagal
         useAuthStore.getState().setAccessToken(null);
 
         return Promise.reject(error);
@@ -102,5 +106,3 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(error);
   },
 );
-
-export default axiosInstance;
