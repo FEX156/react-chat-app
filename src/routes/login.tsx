@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useAuthStore } from "#/store/authStore";
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { publicAxios } from "#/libs/axios";
+import { privateAxios } from "#/libs/axios";
 
 export const Route = createFileRoute("/login")({
   component: LoginForm,
@@ -11,6 +11,7 @@ export const Route = createFileRoute("/login")({
 function LoginForm() {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -18,7 +19,7 @@ function LoginForm() {
 
     try {
       const endpoint = "/auth/login";
-      const { data } = await publicAxios.post(endpoint, payload);
+      const { data } = await privateAxios.post(endpoint, payload);
 
       if (data.data.token) {
         useAuthStore.getState().setAccessToken(data.data.token);

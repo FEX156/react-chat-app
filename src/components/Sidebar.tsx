@@ -1,7 +1,15 @@
 import MessagePlusIcon from "./icons/MessagePlusIcon";
 import MenuDropdown from "./MenuDropdown";
+import { useAuthStore } from "#/store/authStore";
+import { dateFormat } from "#/libs/dateFormater";
 
-export default function Sidebar({ onSelectChat }: any) {
+export default function Sidebar({
+  onSelectChat,
+  chatList,
+  onAddNewConversation,
+}: any) {
+  const userData = useAuthStore.getState().userData;
+
   return (
     <aside
       className="flex flex-col w-full h-screen border-r 
@@ -11,18 +19,17 @@ export default function Sidebar({ onSelectChat }: any) {
       <header
         className="h-16 flex items-center px-5  
       border-gray-200 dark:border-slate-700">
-        <h2 className="font-bold text-2xl mr-auto text-blue-600 dark:text-blue-400">
-          ChatApp
+        <h2 className="font-bold text-xl mr-auto text-blue-600 dark:text-blue-400">
+          Hi {userData?.username}!
         </h2>
 
-        <div className="flex items-center gap-3">
-          <span className="p-2 rounded-full transition text-gray-700 dark:text-gray-200    hover:bg-blue-50 dark:hover:bg-slate-700">
+        <div className="flex items-center gap-1">
+          <span
+            onClick={onAddNewConversation}
+            className="p-2 rounded-full transition text-gray-700 dark:text-gray-200    hover:bg-blue-50 dark:hover:bg-slate-700">
             <MessagePlusIcon />
           </span>
-
-          <span className="p-2 rounded-full transition text-gray-700 dark:text-gray-200    hover:bg-blue-50 dark:hover:bg-slate-700">
-            <MenuDropdown />
-          </span>
+          <MenuDropdown />
         </div>
       </header>
 
@@ -42,39 +49,52 @@ export default function Sidebar({ onSelectChat }: any) {
       </div>
 
       {/* CHAT LIST */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar">
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((_, i) => (
-          <div
-            onClick={() => onSelectChat({ id: i, name: `User ${i}` })}
-            key={i}
-            className="flex items-center gap-3 px-4 py-3 cursor-pointer transition
-            hover:bg-blue-50 dark:hover:bg-slate-700">
-            {/* avatar */}
+      {chatList.length !== 0 ? (
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          {chatList.map((chat: any, i: any) => (
             <div
-              className="w-12 h-12 rounded-full 
-            bg-blue-200 dark:bg-slate-600 
-            flex items-center justify-center 
-            text-blue-700 dark:text-white font-semibold">
-              U
-            </div>
-            {/* text */}
-            <div className="flex-1 min-w-0">
-              <div className="flex justify-between">
-                <h3 className="font-semibold truncate text-gray-900 dark:text-gray-100">
-                  Username {i + 1}
-                </h3>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  12:00
-                </span>
+              onClick={() =>
+                onSelectChat({
+                  id: i,
+                  username: chat.username,
+                  lastSeen: chat.lastSeen,
+                  conversationId: chat.conversationId,
+                })
+              }
+              key={i}
+              className="flex items-center gap-3 px-4 py-3 cursor-pointer transition
+            hover:bg-blue-50 dark:hover:bg-slate-700">
+              {/* avatar */}
+              <div className="w-10 h-10">
+                <img
+                  src={`https://avatars.laravel.cloud/${chat.username}?vibe=ocean`}
+                  alt={chat.username[0]}
+                  className="rounded-full"
+                />
               </div>
+              {/* text */}
+              <div className="flex-1 min-w-0">
+                <div className="flex justify-between">
+                  <h3 className="font-semibold truncate text-gray-900 dark:text-gray-100">
+                    {chat.username}
+                  </h3>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {dateFormat(chat.lastMessageSent)}
+                  </span>
+                </div>
 
-              <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                Last message preview goes here...
-              </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                  {chat.lastMessage}
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <h1 className="text-gray-900 dark:text-gray-100">No Conversations</h1>
+        </div>
+      )}
     </aside>
   );
 }

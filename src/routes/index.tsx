@@ -1,11 +1,14 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { privateAxios } from "#/libs/axios";
 import ChatLayout from "#/layouts/ChatLayout";
+import { useAuthStore } from "#/store/authStore";
 
 export const Route = createFileRoute("/")({
   beforeLoad: async () => {
     try {
-      await privateAxios.get("/auth/me");
+      const response = await privateAxios.get("/auth/me");
+      const data = response.data.data;
+      useAuthStore.getState().setUserData(data);
     } catch (error: unknown) {
       throw redirect({ to: "/login" });
     }

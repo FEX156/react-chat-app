@@ -49,3 +49,7 @@
 .animate-scale-in {
   animation: scale-in 0.15s ease-out;
 }
+
+input:focus {
+  outline: none;
+}

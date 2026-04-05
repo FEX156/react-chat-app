@@ -6,7 +6,7 @@
     "#/*": "./src/*"
   },
   "scripts": {
-    "dev": "vite dev --port 3000",
+    "dev": "vite dev --port 3001",
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run"
@@ -18,9 +18,11 @@
     "@tanstack/react-router-devtools": "latest",
     "@tanstack/router-plugin": "^1.166.13",
     "axios": "^1.13.6",
+    "dayjs": "^1.11.20",
     "lucide-react": "^0.545.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-use-websocket": "^4.13.0",
     "tailwindcss": "^4.2.1",
     "zustand": "^5.0.12"
   },

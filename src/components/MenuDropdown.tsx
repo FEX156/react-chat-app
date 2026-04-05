@@ -30,7 +30,7 @@ export default function MenuDropdown() {
   }, []);
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative text-gray-700 dark:text-gray-200" ref={ref}>
       {/* BUTTON */}
       <button
         onClick={() => setOpen((prev) => !prev)}
@@ -43,7 +43,7 @@ export default function MenuDropdown() {
       {/* DROPDOWN */}
       {open && (
         <div
-          className="absolute left-0 mt-2 w-44 rounded-xl shadow-lg 
+          className="absolute right-0 md:left-0 mt-2 w-44 rounded-xl shadow-lg 
           bg-white dark:bg-slate-800 border 
           border-gray-200 dark:border-slate-700
           overflow-hidden animate-fade-in">
