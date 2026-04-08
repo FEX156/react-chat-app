@@ -23,7 +23,6 @@ export default function NewConversation({ onBack, onCreated }: Props) {
 
       const newConversation = res.data.data;
 
-      // 🔥 redirect via state
       onCreated(newConversation);
     } catch (err: any) {
       console.log(err);
@@ -33,7 +32,7 @@ export default function NewConversation({ onBack, onCreated }: Props) {
   return (
     <div className="flex flex-col flex-1 bg-white dark:bg-[#0f172a]">
       {/* HEADER */}
-      <header className="h-16 flex  gap-2 items-center px-4 border-b border-gray-200 dark:border-slate-700">
+      <header className="h-16 flex  gap-2 items-center px-4 shadow-md">
         {/* BACK BUTTON (mobile only) */}
         <button
           onClick={onBack}
@@ -68,7 +67,7 @@ export default function NewConversation({ onBack, onCreated }: Props) {
       </div>
 
       {/* INPUT MESSAGE */}
-      <div className="p-3 border-t border-gray-200 dark:border-slate-700">
+      <div className="p-3 border-gray-200 dark:border-slate-700">
         <form onSubmit={handleSend}>
           <div className="flex gap-2">
             <input

@@ -1,12 +1,13 @@
 import MessagePlusIcon from "./icons/MessagePlusIcon";
 import MenuDropdown from "./MenuDropdown";
 import { useAuthStore } from "#/store/authStore";
-import { dateFormat } from "#/libs/dateFormater";
+import { getDateLabel } from "#/libs/dateFormater";
 
 export default function Sidebar({
   onSelectChat,
   chatList,
   onAddNewConversation,
+  onJoinRoom,
 }: any) {
   const userData = useAuthStore.getState().userData;
 
@@ -51,17 +52,18 @@ export default function Sidebar({
       {/* CHAT LIST */}
       {chatList.length !== 0 ? (
         <div className="flex-1 overflow-y-auto custom-scrollbar">
-          {chatList.map((chat: any, i: any) => (
+          {chatList.map((chat: any) => (
             <div
-              onClick={() =>
+              onClick={() => {
                 onSelectChat({
-                  id: i,
+                  id: chat.userId,
                   username: chat.username,
                   lastSeen: chat.lastSeen,
                   conversationId: chat.conversationId,
-                })
-              }
-              key={i}
+                });
+                onJoinRoom(chat.conversationId);
+              }}
+              key={chat.userId}
               className="flex items-center gap-3 px-4 py-3 cursor-pointer transition
             hover:bg-blue-50 dark:hover:bg-slate-700">
               {/* avatar */}
@@ -79,13 +81,17 @@ export default function Sidebar({
                     {chat.username}
                   </h3>
                   <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {dateFormat(chat.lastMessageSent)}
+                    {getDateLabel(chat.lastMessageSent)}
                   </span>
                 </div>
-
-                <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                  {chat.lastMessage}
-                </p>
+                <div className="flex justify-between">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                    {chat.lastMessage}
+                  </p>
+                  {/* <span className="text-xs w-4 h-4 text-center rounded-full bg-red-400">
+                    1
+                  </span> */}
+                </div>
               </div>
             </div>
           ))}

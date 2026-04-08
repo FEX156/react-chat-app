@@ -1,91 +1,55 @@
-import { useEffect, useMemo, useState } from "react";
-import { useAuthStore } from "#/store/authStore";
-import { privateAxios } from "#/libs/axios";
 import ArrowLeftStrokeIcon from "./icons/ArrowLeftStrokeIcon";
-import { getDateLabel, dateFormat } from "#/libs/dateFormater";
+import { useState } from "react";
+import { useAuthStore } from "#/store/authStore";
+import { dateFormat, timeFormater } from "#/libs/dateFormater";
+import { useChatStore } from "#/store/useChatStore";
+import { useGroupedMessages } from "#/hooks/useGroupedMessages";
+import { useAutoScroll } from "#/hooks/useAutoScroll";
+import { useChatSocket } from "#/hooks/useChatSocket";
 
 export default function ChatRoom({ chat, onBack }: any) {
-  const [messages, setMessages] = useState<any>([]);
+  const userData = useAuthStore((state) => state.userData);
+  const users = useChatStore((state) => state.onlineUsers);
   const [newMessage, setNewMessage] = useState<any>("");
-  const userData = useAuthStore.getState().userData;
-
-  const fetchdata = async () => {
-    try {
-      const response = await privateAxios.get(
-        `/messages/${chat.conversationId}`,
-      );
-      const result = response.data.data;
-
-      result.sort(
-        (a: any, b: any) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-      );
-
-      setMessages(result);
-    } catch (err: any) {
-      console.log(err);
-    }
-  };
+  const { groupedMessages } = useGroupedMessages(chat);
+  const [containerRef, bottomRef] = useAutoScroll(groupedMessages);
+  const { sendJsonMessage } = useChatSocket();
 
   const handleSendMessage = async (e: any) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
 
     const message = newMessage;
+    const tempId = crypto.randomUUID();
 
     const tempMessage = {
-      id: Date.now(),
+      id: tempId,
+      tempId,
       content: message,
-      senderId: userData?.id,
+      status: "sending",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+      conversationId: chat.conversationId,
+      senderId: userData?.id,
     };
 
-    setMessages((prev: any) => [...prev, tempMessage]);
+    useChatStore.getState().addMessage(tempMessage);
     setNewMessage("");
 
-    try {
-      await privateAxios.post("/messages", {
-        content: message,
-        status: "sent",
-        conversationId: chat.conversationId,
-        senderId: userData?.id,
-      });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  useEffect(() => {
-    fetchdata();
-  }, [chat]);
-
-  const groupedMessages = useMemo(() => {
-    const groups: Record<string, any[]> = {};
-
-    messages.forEach((msg: any) => {
-      const date = new Date(msg.createdAt || msg.updatedAt);
-      const label = getDateLabel(date);
-
-      if (!groups[label]) {
-        groups[label] = [];
-      }
-
-      groups[label].push(msg);
+    sendJsonMessage({
+      type: "send_message",
+      roomId: chat.conversationId,
+      content: message,
+      tempId,
     });
-
-    return Object.entries(groups).map(([label, msgs]) => ({
-      label,
-      messages: msgs,
-    }));
-  }, [messages]);
+  };
 
   return (
     <div className="flex flex-col flex-1 bg-white dark:bg-[#0f172a]">
       {/* HEADER */}
-      <header className="h-16 flex items-center px-4 shadow-md border-gray-200 dark:border-slate-700">
+      <header className="h-16 flex items-center px-4 shadow-md ">
         <button
-          onClick={onBack}
+          onClick={() => onBack(chat.conversationId)}
           className="mr-3 md:hidden p-2 text-white hover:bg-blue-50 dark:hover:bg-slate-700 rounded-full">
           <ArrowLeftStrokeIcon width={32} height={32} />
         </button>
@@ -94,14 +58,20 @@ export default function ChatRoom({ chat, onBack }: any) {
           <h2 className="font-semibold text-lg text-gray-900 dark:text-white">
             {chat.username}
           </h2>
-          <p className="text-sm text-gray-900 dark:text-white">
-            Last seen at {dateFormat(chat.lastSeen)}
-          </p>
+          {users.has(chat.id) ? (
+            <p className="text-sm text-blue-500 ">online</p>
+          ) : (
+            <p className="text-sm text-gray-900 dark:text-white">
+              Last seen {dateFormat(chat.lastSeen)}
+            </p>
+          )}
         </div>
       </header>
 
       {/* MESSAGES */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
+      <div
+        ref={containerRef}
+        className="flex-1 overflow-y-auto p-4 space-y-6 custom-scrollbar">
         {groupedMessages.map((group: any, index: number) => (
           <div key={index}>
             {/*  DATE LABEL */}
@@ -114,23 +84,26 @@ export default function ChatRoom({ chat, onBack }: any) {
             {/* MESSAGES */}
             <div className="space-y-4">
               {group.messages.map((msg: any) => (
-                <div
-                  key={msg.id}
-                  className={`max-w-[40%] px-4 py-2 rounded-xl text-sm
+                <div key={msg.id} className="flex">
+                  <div
+                    className={`max-w-[90%] md:max-w-[40%] md:min-w-40 px-4 py-2 rounded-xl text-sm 
                   ${
                     msg.senderId === userData?.id
                       ? "bg-blue-500 text-white ml-auto"
                       : "bg-gray-200 dark:bg-slate-700 dark:text-white"
                   }`}>
-                  <div>{msg.content}</div>
-                  <span className="text-xs">
-                    {dateFormat(msg.updatedAt || msg.createdAt)}
-                  </span>
+                    <div>{msg.content}</div>
+                    <div className="text-xs text-end">
+                      {timeFormater(msg.updatedAt || msg.createdAt)}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         ))}
+
+        <div ref={bottomRef} />
       </div>
 
       {/* INPUT */}
@@ -150,7 +123,8 @@ export default function ChatRoom({ chat, onBack }: any) {
 
             <button
               type="submit"
-              className="px-4 py-3 bg-blue-500 text-white rounded-full cursor-pointer">
+              disabled={!newMessage}
+              className="px-4 py-2 bg-blue-500 text-white rounded-full cursor-pointer disabled:opacity-50">
               Send
             </button>
           </div>

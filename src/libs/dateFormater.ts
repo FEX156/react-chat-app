@@ -17,28 +17,30 @@ export function dateFormat(isoStr: string) {
   const diffTime = startOfToday.getTime() - startOfDate.getTime();
   const diffDays = diffTime / (1000 * 60 * 60 * 24);
 
-  // 🟢 Hari ini → jam saja
-  if (diffDays === 0) {
-    return new Intl.DateTimeFormat("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
-  }
+  const time = new Intl.DateTimeFormat("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
 
-  // 🟡 Kemarin
-  if (diffDays === 1) {
-    return "Yesterday"; // kalau mau indo: "Kemarin"
-  }
-
-  // 🔵 Selain itu → tanggal (mirip WhatsApp)
-  return new Intl.DateTimeFormat("id-ID", {
+  const formateDdate = new Intl.DateTimeFormat("id-ID", {
     day: "numeric",
-    month: "long",
+    month: "numeric",
     year: "numeric",
   }).format(date);
+
+  if (diffDays === 0) {
+    return "today at " + time;
+  }
+
+  if (diffDays === 1) {
+    return "yesterday at " + time;
+  }
+
+  return formateDdate + " at " + time;
 }
 
-export function getDateLabel(date: Date) {
+export function getDateLabel(rawdate: string) {
+  const date = new Date(rawdate);
   const now = new Date();
 
   const startOfToday = new Date(
@@ -63,5 +65,13 @@ export function getDateLabel(date: Date) {
     day: "numeric",
     month: "long",
     year: "numeric",
+  }).format(date);
+}
+
+export function timeFormater(isoStr: string) {
+  const date = new Date(isoStr);
+  return new Intl.DateTimeFormat("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
   }).format(date);
 }

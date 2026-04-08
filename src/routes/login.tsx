@@ -58,7 +58,7 @@ function LoginForm() {
               type="email"
               required
               placeholder="name@example.com"
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#24A1DE] focus:ring-1 focus:ring-[#24A1DE]"
+              className="w-full text-gray-800 rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#24A1DE] focus:ring-1 focus:ring-[#24A1DE]"
             />
           </div>
 
@@ -72,7 +72,7 @@ function LoginForm() {
               required
               minLength={6}
               placeholder="••••••••"
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#24A1DE] focus:ring-1 focus:ring-[#24A1DE]"
+              className="w-full text-gray-800 rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#24A1DE] focus:ring-1 focus:ring-[#24A1DE]"
             />
           </div>
 
